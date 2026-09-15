@@ -1,9 +1,12 @@
 # Apply Scout 조사 지침
 
-[English documentation](en/research-instructions.md) · [한국어 문서](ko/research-instructions.md)
+[English](../en/research-instructions.md) · **한국어**
 
 사용자 프로필과 지정 사이트를 바탕으로 현재 지원 가능한 공고를 조사한다.
 최종 응답은 제공된 JSON Schema를 따르는 JSON 객체 하나다. 파일 수정이나 셸 명령은 필요 없다.
+
+이 문서는 한국어 문서판이다. 프로그램은 실행 시 `docs/research-instructions.md`를 읽는다.
+출력 규격과 호환되도록 아래에 제시된 분류 값을 유지한다.
 
 ## 조사
 

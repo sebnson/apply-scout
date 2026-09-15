@@ -11,3 +11,12 @@ Save valid research to `output/research.json`, then run
 Do not invent job postings or claim live research when browsing is unavailable.
 Preserve user notes and support the existing output contract.
 Never commit personal inputs or generated research from the default private folders.
+
+## Documentation
+
+Maintain paired Markdown documentation under `docs/en/` and `docs/ko/`.
+Keep translations, relative links, and language navigation in sync. The runtime
+research prompt remains `docs/research-instructions.md`; align both localized guides
+with it. English examples are documentation previews, not an English rendering mode.
+
+Human-readable agent guides: [English](docs/en/agent-guide.md) · [한국어](docs/ko/agent-guide.md).
