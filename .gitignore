@@ -1,0 +1,13 @@
+# Personal inputs and generated research are private by default.
+/inputs/
+/output/
+/.apply-scout/
+*.local.md
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+.venv/
+.DS_Store
+*.tmp

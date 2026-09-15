@@ -1,0 +1,78 @@
+{
+  "jobs": {
+    "cd22ed94d8e54e30": {
+      "job": {
+        "company": "가상회사 A",
+        "role": "백엔드 개발자",
+        "url": "https://example.com/jobs/backend-a",
+        "checked_at": "2026-09-15",
+        "deadline_kind": "dated",
+        "deadline": "2026-09-20",
+        "deadline_note": "가상 예시. 실제 채용 공고가 아닙니다.",
+        "closed": false,
+        "match": "높음",
+        "summary": "API 설계와 PostgreSQL 성능 개선 경험이 주요 업무와 연결됩니다. 운영 규모는 추가 확인이 필요합니다.",
+        "requirements": [
+          {
+            "requirement": "Python API 설계 및 운영",
+            "evidence": "portfolio.md / 주문 API 개선: API 설계·배포, p95 응답 시간 개선",
+            "assessment": "충족",
+            "source_url": "https://example.com/jobs/backend-a"
+          },
+          {
+            "requirement": "대규모 트래픽 대응",
+            "evidence": "profile.md, portfolio.md에 트래픽 규모가 기재되지 않음",
+            "assessment": "확인 필요",
+            "source_url": "https://example.com/jobs/backend-a"
+          }
+        ],
+        "gaps": [
+          "실제 운영 트래픽 규모와 본인 담당 범위 확인"
+        ],
+        "actions": [
+          "주문 API 프로젝트에서 본인이 내린 설계 결정을 정리",
+          "이력서에 응답 시간 개선 근거와 측정 환경 추가"
+        ]
+      },
+      "status": "검토 전",
+      "note": ""
+    },
+    "dbd868e97b641eef": {
+      "job": {
+        "company": "가상회사 B",
+        "role": "플랫폼 개발자",
+        "url": "https://example.com/jobs/platform-b",
+        "checked_at": "2026-09-15",
+        "deadline_kind": "dated",
+        "deadline": "2026-09-25",
+        "deadline_note": "가상 예시. 실제 채용 공고가 아닙니다.",
+        "closed": false,
+        "match": "보통",
+        "summary": "API 설계와 PostgreSQL 성능 개선 경험이 주요 업무와 연결됩니다. 운영 규모는 추가 확인이 필요합니다.",
+        "requirements": [
+          {
+            "requirement": "Python API 설계 및 운영",
+            "evidence": "portfolio.md / 주문 API 개선: API 설계·배포, p95 응답 시간 개선",
+            "assessment": "충족",
+            "source_url": "https://example.com/jobs/platform-b"
+          },
+          {
+            "requirement": "대규모 트래픽 대응",
+            "evidence": "profile.md, portfolio.md에 트래픽 규모가 기재되지 않음",
+            "assessment": "확인 필요",
+            "source_url": "https://example.com/jobs/platform-b"
+          }
+        ],
+        "gaps": [
+          "실제 운영 트래픽 규모와 본인 담당 범위 확인"
+        ],
+        "actions": [
+          "주문 API 프로젝트에서 본인이 내린 설계 결정을 정리",
+          "이력서에 응답 시간 개선 근거와 측정 환경 추가"
+        ]
+      },
+      "status": "검토 전",
+      "note": ""
+    }
+  }
+}
