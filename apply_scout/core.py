@@ -8,9 +8,8 @@ from datetime import date, timedelta
 from pathlib import Path
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit, quote
 
+from .schema import DEADLINES, MATCHES
 
-MATCHES = ("높음", "보통", "낮음", "판단 보류")
-DEADLINES = ("dated", "rolling", "unspecified", "unknown")
 START = "<!-- user-notes:start -->"
 END = "<!-- user-notes:end -->"
 
