@@ -19,3 +19,21 @@ The v2 contract is introduced before switching provider output; v1 remains suppo
 The instruction hash covers only runtime instructions and the JSON Schema, never personal documents
 or the complete prompt. Code checks structure and internal consistency; it cannot establish whether
 an official-source claim or experience description is true. Users still need to review the evidence.
+
+## Validation and compatibility
+
+`met`, `partial`, and `unmet` require profile evidence. Missing information uses `unknown`, with a
+question or explanation in `rationale`. Evidence filenames must occur in `run.input_files`; live callers
+also supply the actual filenames to prevent a fabricated manifest. Offline rendering trusts the saved
+manifest and does not read local personal files. Linked job evidence must use the posting URL or a
+checked official link declared on that job.
+
+A required `unmet` item forbids `높음`. When every required item is `unknown`, both `높음` and `보통`
+are rejected. Empty requirements or entirely unknown importance classifications produce warnings.
+Errors include a JSON path and a correction. These checks do not score semantic fit or hiring probability.
+
+Unversioned and explicit `"1"` results retain their original assessments and evidence. The in-memory
+converter uses the v2 requirement layout but keeps `schema_version="1"` and the original `legacy` fields;
+it does not manufacture file/section references, posting quotations, metadata, or importance. Known Korean
+assessment labels map to their equivalent enum; custom legacy labels stay unchanged. This internal view
+is not exported as new v2 research. Removing v1 reading requires a separate major-version decision.

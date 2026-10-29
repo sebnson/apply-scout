@@ -1,32 +1,17 @@
 """Validate research and render a persistent Markdown application tracker."""
 
-import hashlib
 import html
 import json
 import re
 from datetime import date, timedelta
 from pathlib import Path
-from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit, quote
+from urllib.parse import quote
 
-from .schema import DEADLINES, MATCHES
+from .schema import MATCHES
+from .validation import canonical_url, job_id, validate
 
 START = "<!-- user-notes:start -->"
 END = "<!-- user-notes:end -->"
-
-
-def canonical_url(value):
-    parts = urlsplit(value)
-    if parts.scheme not in ("https", "http") or not parts.hostname or parts.username or parts.password:
-        raise ValueError("공고·출처 링크는 자격 증명이 없는 http(s) URL이어야 합니다.")
-    query = [(k, v) for k, v in parse_qsl(parts.query, keep_blank_values=True)
-             if not k.lower().startswith("utm_") and k.lower() not in ("fbclid", "gclid")]
-    # Preserve fragments: several ATS products use hash-based job routes.
-    return urlunsplit((parts.scheme.lower(), parts.netloc.lower(), parts.path or "/",
-                       urlencode(sorted(query)), parts.fragment))
-
-
-def job_id(url):
-    return hashlib.sha256(canonical_url(url).encode()).hexdigest()[:16]
 
 
 def text(value):
@@ -39,64 +24,6 @@ def text(value):
 
 def link(label, url):
     return f"[{text(label)}]({quote(url, safe=':/?=&%#+@;~-._')})"
-
-
-def check_string(obj, field):
-    if not isinstance(obj.get(field), str) or not obj[field].strip():
-        raise ValueError(f"{field}: 비어 있지 않은 문자열이 필요합니다.")
-
-
-def validate(data):
-    if not isinstance(data, dict) or not isinstance(data.get("jobs"), list) or not isinstance(data.get("sources"), list):
-        raise ValueError("jobs와 sources 배열이 필요합니다.")
-    check_string(data, "searched_at")
-    searched = date.fromisoformat(data["searched_at"])
-    seen = set()
-    for job in data["jobs"]:
-        if not isinstance(job, dict):
-            raise ValueError("공고는 객체여야 합니다.")
-        for field in ("company", "role", "url", "checked_at", "deadline_kind", "deadline_note", "match", "summary"):
-            check_string(job, field)
-        key = job_id(job["url"])
-        if key in seen:
-            raise ValueError("중복 공고 URL이 있습니다. 원문 공고 하나로 통합하세요.")
-        seen.add(key)
-        checked = date.fromisoformat(job["checked_at"])
-        if checked > searched:
-            raise ValueError("공고 확인일이 조사일보다 미래입니다.")
-        if job["deadline_kind"] not in DEADLINES or job["match"] not in MATCHES:
-            raise ValueError("마감일 유형 또는 매칭 평가가 올바르지 않습니다.")
-        if job["deadline_kind"] == "dated":
-            date.fromisoformat(job.get("deadline", ""))
-        elif job.get("deadline") is not None:
-            raise ValueError("날짜가 없는 마감 유형은 deadline=null이어야 합니다.")
-        if type(job.get("closed")) is not bool:
-            raise ValueError("closed는 boolean이어야 합니다.")
-        for field in ("requirements", "gaps", "actions"):
-            if not isinstance(job.get(field), list):
-                raise ValueError(f"{field} 배열이 필요합니다.")
-        if not job["requirements"]:
-            raise ValueError("공고마다 최소 하나의 요구사항과 판단 근거가 필요합니다.")
-        for item in job["requirements"]:
-            if not isinstance(item, dict):
-                raise ValueError("요구사항은 객체여야 합니다.")
-            for field in ("requirement", "evidence", "assessment", "source_url"):
-                check_string(item, field)
-            canonical_url(item["source_url"])
-        for item in job["gaps"] + job["actions"]:
-            if not isinstance(item, str) or not item.strip():
-                raise ValueError("보완점과 준비 항목은 문자열이어야 합니다.")
-    for source in data["sources"]:
-        if not isinstance(source, dict):
-            raise ValueError("출처는 객체여야 합니다.")
-        for field in ("url", "status", "note"):
-            check_string(source, field)
-        canonical_url(source["url"])
-        if source["status"] not in ("checked", "blocked", "failed"):
-            raise ValueError("출처 상태는 checked, blocked, failed 중 하나여야 합니다.")
-    if not data["sources"]:
-        raise ValueError("조사한 출처 또는 접근 실패 기록이 필요합니다.")
-    return data
 
 
 def user_notes(path):
