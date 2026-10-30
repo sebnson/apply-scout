@@ -135,6 +135,15 @@ def validate_consistency(data, input_files=None):
     return warnings
 
 
+def validate_run_metadata(data, expected):
+    """Compare provider metadata to the trusted request, never to model claims."""
+    for field in ('agent', 'instruction_hash'):
+        if data['run'][field] != expected[field]:
+            fail('$.run.' + field, 'return the run metadata supplied in the request unchanged')
+    if set(data['run']['input_files']) != set(expected['input_files']):
+        fail('$.run.input_files', 'must match the documents actually included in the request')
+
+
 def normalize(data):
     """Copy v1 requirements to the v2 layout without fabricating provenance.
 

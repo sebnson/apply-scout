@@ -65,7 +65,7 @@ class EvaluationTests(unittest.TestCase):
         result = evaluate_case(FIXTURES / 'required-gap', data)
         self.assertFalse(result['passed'])
         self.assertEqual(result['fixture'], 'required-gap')
-        self.assertIn('$.jobs[0].match', result['failures'][0]['message'])
+        self.assertEqual('$.jobs[0].match', result['failures'][0]['path'])
         data = self.payload('partial-evidence')
         data['jobs'][0]['requirements'][0]['profile_evidence'] = []
         self.assertIn('contract', self.rules('partial-evidence', data))

@@ -37,3 +37,14 @@ converter uses the v2 requirement layout but keeps `schema_version="1"` and the 
 it does not manufacture file/section references, posting quotations, metadata, or importance. Known Korean
 assessment labels map to their equivalent enum; custom legacy labels stay unchanged. This internal view
 is not exported as new v2 research. Removing v1 reading requires a separate major-version decision.
+
+## Run metadata
+
+`run` builds a trusted metadata record from the files read into the request. Returned agent, instruction
+hash, and filenames must match it before research or Markdown is saved. `prompt` uses `agent="external"`
+for a manually managed run. Saved research keeps the original hash when rendered later.
+
+The hash is SHA-256 of UTF-8 JSON containing `instructions` and `schema`, serialized with sorted keys,
+`ensure_ascii=False`, and compact separators. Changing input content, the day, result limit, or provider
+never changes this hash. It identifies an instruction/schema version, not proof of research accuracy.
+[Evaluation reports](quality-evaluation.md) distinguish that hash from the hash in each saved response.

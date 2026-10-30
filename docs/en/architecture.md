@@ -49,3 +49,5 @@ See the [v2 contract and compatibility rules](research-contract.md). New researc
 posting and profile evidence. Rendering retains v1 support and user notes; warnings are shown in reports.
 
 [Quality evaluation](quality-evaluation.md) uses six fictional offline cases and constraint-based checks.
+
+[Tailoring and rewriting](tailoring-followup.md) have a separate follow-up plan; they are not part of v0.2.

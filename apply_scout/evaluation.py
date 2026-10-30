@@ -3,14 +3,14 @@
 import json
 from pathlib import Path
 
-from .validation import validate, validate_consistency
+from .validation import validate, validate_consistency, validate_run_metadata
 
 
 def compact(value):
     return ' '.join(value.split()).casefold()
 
 
-def evaluate_case(directory, data):
+def evaluate_case(directory, data, expected_run=None):
     directory = Path(directory)
     expected = json.loads((directory / 'expected.json').read_text(encoding='utf-8'))
     posting = json.loads((directory / 'posting.json').read_text(encoding='utf-8'))
@@ -25,9 +25,14 @@ def evaluate_case(directory, data):
         return result
     try:
         validate(data, input_files=documents)
+        if expected_run is not None:
+            validate_run_metadata(data, expected_run)
     except (ValueError, TypeError) as exc:
-        failure('contract', '$', str(exc))
+        message = str(exc)
+        path, _, detail = message.partition(': ')
+        failure('contract', path if path.startswith('$') else '$', detail or message)
         return result
+    result['run'] = dict(data['run'])
     result['warnings'] = validate_consistency(data)
     if len(result['warnings']) != expected.get('warning_count', 0):
         failure('warnings', '$.jobs', f"expected {expected.get('warning_count', 0)} warnings; got {len(result['warnings'])}")

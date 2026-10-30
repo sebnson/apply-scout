@@ -41,3 +41,38 @@ python3 -m apply_scout evaluate --responses output/quality-responses
 서로 다른 개수를 기록한다. 차이 자체를 품질 실패로 단정하지 않는다. 누락되거나 잘못된 JSON 응답은 실패한다.
 
 [조사 규격](research-contract.md)도 참고한다. 오프라인 테스트는 유료 제공자를 호출하지 않는다.
+
+## 변경 전후 결과 기록
+
+```sh
+python3 -m apply_scout evaluate --result output/quality-before.json
+# 런타임 지침이나 스키마를 바꾼 후 새로 생성해 저장한 응답을 평가한다.
+python3 -m apply_scout evaluate --responses output/quality-after-responses --result output/quality-after.json
+```
+
+보고서는 평가 시각, `evaluator_instruction_hash`, 유효한 각 응답의 `run` 메타데이터를 기록한다.
+평가기 해시는 현재 지침·스키마의 값이며 응답은 이전 해시로 생성되었을 수 있다. PR에서는 두 보고서의
+실패와 구조 차이를 비교한다. 포함된 오프라인 응답을 재검사하는 것은 평가기와 회귀 검증이며,
+새 프롬프트가 모델에 미친 영향을 측정하는 것은 아니다. 그 비교에는 새로 생성한 응답을 사용한다.
+개인 `inputs/` 또는 `output/` 폴더를 커밋하지 않는다.
+
+## 명시적인 제공자 평가
+
+```sh
+python3 -m apply_scout evaluate-live --agent codex --runs 2 --output output/quality-before
+python3 -m apply_scout evaluate-live --agent claude --runs 2 --output output/quality-after
+```
+
+이 명령은 제공자 비용을 발생시킬 수 있다. 반복마다 각 사례에 대해 선택한 CLI를 한 번 호출한다
+(기본 6회). 프롬프트 변경 효과를 비교할 때는 제공자·설정 모델·반복 횟수·사례를 동일하게 유지한다.
+위 명령의 두 제공자는 선택 가능한 대안을 보여 준다. `--runs`는 1~10이며, `--timeout`은 기본
+900초로 **호출별** 제한이다. 전체 평가의 제한 시간이 아니다. 재시도 없이 순차 실행한다.
+CLI에 설정된 모델을 사용하므로 모델명과 CLI 버전은 PR에 별도로 기록한다.
+
+가상 문서와 추출된 공고만 제공하며 `expected.json`과 저장된 응답은 프롬프트에서 제외한다.
+제공자 명령의 웹 검색을 끄고 프롬프트에서도 현재 공고 조사가 아닌 제공된 가상 데이터임을 밝힌다.
+결과 폴더는 새 폴더여야 한다. 각 파싱 응답, 반환된 제공자 원문, `evaluation.json`을 저장한다.
+잘못된 JSON·규격 오류·제공자 실패는 실패 사례로 기록하며 호출이 끝날 때마다 완료된 사례를 저장한다.
+일반 조사는 모든 보고서를 쓰기 전에 검증한다. 단위 테스트는 실제 유료 호출 없이 모의 응답으로 이 경로를 검증한다.
+
+Codex는 [설정 오버라이드](https://developers.openai.com/codex/config-reference/)로 `web_search="disabled"`를 명시하고, Claude에는 빈 기본 도구 목록을 전달한다.
