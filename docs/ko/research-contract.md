@@ -3,7 +3,7 @@
 [English](../en/research-contract.md) · **한국어**
 
 `apply_scout/schema.py`의 딕셔너리 규격과 런타임 검증은 같은 열거형 상수를 사용한다.
-제공자 출력을 전환하기 전에 v2 규격을 도입하며 v1 지원은 유지한다.
+새 제공자 출력은 v2를 사용하며 렌더링은 v1과 v2를 모두 지원한다. [조사 지침](research-instructions.md)을 참고한다.
 
 - `schema_version`: `"2"`.
 - `run`: `agent`, `instruction_hash` (`sha256:` 뒤에 16진수 64자리), `input_files`

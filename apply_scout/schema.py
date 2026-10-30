@@ -57,8 +57,7 @@ V2_SCHEMA = obj({
     "sources": V1_SCHEMA["properties"]["sources"],
 })
 
-# Switch provider output only when the v2 reader and renderer are available.
-SCHEMA = V1_SCHEMA
+SCHEMA = V2_SCHEMA
 
 
 def validate_structure(value, schema=V2_SCHEMA, path="$"):

@@ -3,7 +3,7 @@
 **English** · [한국어](../ko/research-contract.md)
 
 The dictionary contract in `apply_scout/schema.py` shares enum constants with runtime validation.
-The v2 contract is introduced before switching provider output; v1 remains supported.
+New provider output uses v2; rendering accepts both v1 and v2. See the [research instructions](research-instructions.md).
 
 - `schema_version`: `"2"`.
 - `run`: `agent`, `instruction_hash` (`sha256:` plus 64 hexadecimal digits), and `input_files`

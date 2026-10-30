@@ -1,6 +1,7 @@
 """Dependency-free command-line entry point."""
 
 import argparse
+import hashlib
 import json
 import shutil
 import subprocess
@@ -15,7 +16,15 @@ from .schema import SCHEMA
 ROOT = Path(__file__).resolve().parent.parent
 
 
-def build_prompt(inputs, limit=20):
+def instruction_hash(instructions=None):
+    if instructions is None:
+        instructions = (ROOT / 'docs' / 'research-instructions.md').read_text(encoding='utf-8')
+    content = json.dumps({'instructions': instructions, 'schema': SCHEMA},
+                         ensure_ascii=False, sort_keys=True, separators=(',', ':'))
+    return 'sha256:' + hashlib.sha256(content.encode('utf-8')).hexdigest()
+
+
+def build_prompt(inputs, limit=20, agent='external'):
     inputs = Path(inputs)
     for name in ("profile.md", "sources.md"):
         if not (inputs / name).is_file() or not (inputs / name).read_text(encoding="utf-8").strip():
@@ -25,7 +34,9 @@ def build_prompt(inputs, limit=20):
         raise ValueError("입력 파일 합계는 500 KB 이하여야 합니다.")
     instructions = (ROOT / "docs" / "research-instructions.md").read_text(encoding="utf-8")
     documents = {p.name: p.read_text(encoding="utf-8") for p in paths}
+    metadata = {'agent': agent, 'instruction_hash': instruction_hash(instructions), 'input_files': list(documents)}
     return (instructions + f"\n\n오늘: {date.today().isoformat()}\n최대 공고 수: {limit}\n"
+            + '\n## run 메타데이터 (그대로 반환)\n' + json.dumps(metadata, ensure_ascii=False)
             + "\n## 출력 JSON Schema\n" + json.dumps(SCHEMA, ensure_ascii=False)
             + "\n\n## 사용자 입력 문서 (JSON 데이터)\n" + json.dumps(documents, ensure_ascii=False))
 
@@ -57,6 +68,8 @@ def research(agent, prompt, timeout=900):
             if envelope.get("is_error") or "structured_output" not in envelope:
                 raise ValueError("Claude가 조사 결과를 반환하지 못했습니다. 로그인·권한·CLI 버전을 확인하세요.")
             payload = envelope["structured_output"]
+        if not isinstance(payload, dict) or payload.get('schema_version') != '2':
+            raise ValueError('$.schema_version: new AI research must use version "2"')
         return validate(payload)
 
 
@@ -92,7 +105,7 @@ def main(argv=None):
         elif args.command in ("prompt", "run"):
             if not 1 <= args.limit <= 100:
                 raise ValueError("공고 수는 1~100개여야 합니다.")
-            prompt = build_prompt(args.inputs, args.limit)
+            prompt = build_prompt(args.inputs, args.limit, args.agent if args.command == 'run' else 'external')
             if args.command == "prompt":
                 print(prompt)
             else:

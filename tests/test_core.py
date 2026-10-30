@@ -102,6 +102,36 @@ class TrackerTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 canonical_url(url)
 
+    def test_v1_render_and_v2_migration_preserve_notes(self):
+        legacy = json.loads((ROOT / "tests/fixtures/research-v1.json").read_text())
+        original = copy.deepcopy(legacy)
+        path = self.render(legacy)
+        path.write_text(path.read_text().replace("검토 전 |  |", "지원 완료 | 이전 메모 |", 1))
+        detail = self.output / "jobs" / f"{job_id(legacy['jobs'][0]['url'])}.md"
+        self.assertIn("충족", detail.read_text())
+        detail.write_text(detail.read_text().replace(START + "\n\n" + END, START + "\nv1 메모\n" + END))
+        self.assertEqual(legacy, original)
+        content = self.render().read_text()
+        self.assertIn("지원 완료 | 이전 메모", content)
+        self.assertIn("v1 메모", detail.read_text())
+        self.assertIn("판단 이유", detail.read_text())
+        self.assertIn("portfolio.md / 주문 API 개선", detail.read_text())
+
+    def test_v2_warnings_are_visible_in_tracker_and_detail(self):
+        self.data['jobs'][0]['requirements'] = []
+        content = self.render().read_text()
+        self.assertIn("검증 경고", content)
+        detail = self.output / 'jobs' / f"{job_id(self.data['jobs'][0]['url'])}.md"
+        self.assertIn("검증 경고", detail.read_text())
+
+    @patch("apply_scout.__main__.shutil.which", return_value="/bin/fake")
+    @patch("apply_scout.__main__.subprocess.run")
+    def test_new_provider_result_cannot_use_v1(self, run, which):
+        legacy = json.loads((ROOT / 'tests/fixtures/research-v1.json').read_text())
+        run.return_value = CompletedProcess([], 0, json.dumps({'structured_output': legacy}))
+        with self.assertRaisesRegex(ValueError, 'schema_version'):
+            research('claude', 'test')
+
     def test_init_does_not_overwrite_profile(self):
         target = Path(self.temp.name) / "inputs"
         main(["init", "--inputs", str(target)])

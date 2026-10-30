@@ -15,15 +15,31 @@
       "requirements": [
         {
           "requirement": "Python API 설계 및 운영",
-          "evidence": "portfolio.md / 주문 API 개선: API 설계·배포, p95 응답 시간 개선",
-          "assessment": "충족",
-          "source_url": "https://example.com/jobs/backend-a"
+          "importance": "required",
+          "assessment": "partial",
+          "job_evidence": {
+            "source_url": "https://example.com/jobs/backend-a",
+            "detail": "Python API 설계 및 운영"
+          },
+          "profile_evidence": [
+            {
+              "file": "portfolio.md",
+              "section": "주문 API 개선",
+              "detail": "API 설계·배포, p95 응답 시간 개선"
+            }
+          ],
+          "rationale": "설계·배포 근거가 있으나 운영 경험은 확인 필요"
         },
         {
           "requirement": "대규모 트래픽 대응",
-          "evidence": "profile.md, portfolio.md에 트래픽 규모가 기재되지 않음",
-          "assessment": "확인 필요",
-          "source_url": "https://example.com/jobs/backend-a"
+          "importance": "preferred",
+          "assessment": "unknown",
+          "job_evidence": {
+            "source_url": "https://example.com/jobs/backend-a",
+            "detail": "대규모 트래픽 대응"
+          },
+          "profile_evidence": [],
+          "rationale": "입력에 트래픽 규모가 없어 확인 필요"
         }
       ],
       "gaps": [
@@ -32,7 +48,8 @@
       "actions": [
         "주문 API 프로젝트에서 본인이 내린 설계 결정을 정리",
         "이력서에 응답 시간 개선 근거와 측정 환경 추가"
-      ]
+      ],
+      "official_source_urls": []
     },
     {
       "company": "가상회사 B",
@@ -48,15 +65,31 @@
       "requirements": [
         {
           "requirement": "Python API 설계 및 운영",
-          "evidence": "portfolio.md / 주문 API 개선: API 설계·배포, p95 응답 시간 개선",
-          "assessment": "충족",
-          "source_url": "https://example.com/jobs/platform-b"
+          "importance": "required",
+          "assessment": "partial",
+          "job_evidence": {
+            "source_url": "https://example.com/jobs/platform-b",
+            "detail": "Python API 설계 및 운영"
+          },
+          "profile_evidence": [
+            {
+              "file": "portfolio.md",
+              "section": "주문 API 개선",
+              "detail": "API 설계·배포, p95 응답 시간 개선"
+            }
+          ],
+          "rationale": "설계·배포 근거가 있으나 운영 경험은 확인 필요"
         },
         {
           "requirement": "대규모 트래픽 대응",
-          "evidence": "profile.md, portfolio.md에 트래픽 규모가 기재되지 않음",
-          "assessment": "확인 필요",
-          "source_url": "https://example.com/jobs/platform-b"
+          "importance": "preferred",
+          "assessment": "unknown",
+          "job_evidence": {
+            "source_url": "https://example.com/jobs/platform-b",
+            "detail": "대규모 트래픽 대응"
+          },
+          "profile_evidence": [],
+          "rationale": "입력에 트래픽 규모가 없어 확인 필요"
         }
       ],
       "gaps": [
@@ -65,7 +98,8 @@
       "actions": [
         "주문 API 프로젝트에서 본인이 내린 설계 결정을 정리",
         "이력서에 응답 시간 개선 근거와 측정 환경 추가"
-      ]
+      ],
+      "official_source_urls": []
     }
   ],
   "sources": [
@@ -74,5 +108,15 @@
       "status": "checked",
       "note": "출력 형식 설명을 위한 가상 데이터. 실제 웹 조사를 수행하지 않았습니다."
     }
-  ]
+  ],
+  "schema_version": "2",
+  "run": {
+    "agent": "example",
+    "instruction_hash": "sha256:5698de64e8a598bd56c4277bb9cd1213d290f4dada69f1d0da13ad2908833d43",
+    "input_files": [
+      "profile.md",
+      "portfolio.md",
+      "sources.md"
+    ]
+  }
 }

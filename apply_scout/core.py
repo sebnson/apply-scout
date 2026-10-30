@@ -8,7 +8,7 @@ from pathlib import Path
 from urllib.parse import quote
 
 from .schema import MATCHES
-from .validation import canonical_url, job_id, validate
+from .validation import canonical_url, job_id, normalize, validate, validate_consistency
 
 START = "<!-- user-notes:start -->"
 END = "<!-- user-notes:end -->"
@@ -67,6 +67,8 @@ def is_closed(job, today):
 
 def render(data, output, today=None, buffer_days=2):
     validate(data)
+    warnings = validate_consistency(data) if data.get('schema_version') == '2' else []
+    data = normalize(data)
     today = today or date.today()
     if buffer_days < 0:
         raise ValueError("지원 여유일은 0 이상이어야 합니다.")
@@ -95,9 +97,25 @@ def render(data, output, today=None, buffer_days=2):
                  f"- 공고: {link('원문 보기', job['url'])}", f"- 확인일: {job['checked_at']}",
                  f"- 마감일: {deadline_label(job)}", f"- 마감 안내: {text(job['deadline_note'])}",
                  f"- 매칭 평가: **{job['match']}**", "", "## 직무와 적합성 요약", "", text(job["summary"]), "",
-                 "## 요구사항과 내 경험", "", "| 요구사항 | 내 경험의 근거 | 판단 | 출처 |", "|---|---|---|---|"]
-        for r in job["requirements"]:
-            lines.append(f"| {text(r['requirement'])} | {text(r['evidence'])} | {text(r['assessment'])} | {link('원문', r['source_url'])} |")
+                 "## 요구사항과 내 경험", ""]
+        if data['schema_version'] == '1':
+            lines += ["| 요구사항 | 내 경험의 근거 | 판단 | 출처 |", "|---|---|---|---|"]
+            for r in job['requirements']:
+                old = r['legacy']
+                lines.append(f"| {text(r['requirement'])} | {text(old['evidence'])} | {text(old['assessment'])} | {link('원문', old['source_url'])} |")
+        else:
+            importance = {'required': '필수', 'preferred': '우대', 'responsibility': '담당 업무', 'unknown': '확인 필요'}
+            assessment = {'met': '충족', 'partial': '부분 충족', 'unmet': '미충족', 'unknown': '확인 필요'}
+            lines += ["| 요구사항 | 중요도 | 공고 근거 | 내 경험의 근거 | 판단 | 판단 이유 | 출처 |", "|---|---|---|---|---|---|---|"]
+            for r in job['requirements']:
+                evidence = '; '.join(f"{e['file']} / {e['section']}: {e['detail']}" for e in r['profile_evidence']) or '입력 근거 없음'
+                cells = [text(r['requirement']), importance[r['importance']], text(r['job_evidence']['detail']),
+                         text(evidence), assessment[r['assessment']], text(r['rationale']), link('원문', r['job_evidence']['source_url'])]
+                lines.append('| ' + ' | '.join(cells) + ' |')
+            index = next(i for i, item in enumerate(data['jobs']) if job_id(item['url']) == key)
+            job_warnings = [warning for warning in warnings if warning.startswith(f'$.jobs[{index}].')]
+            if job_warnings:
+                lines += ['', '## 검증 경고', ''] + [f'- {text(w)}' for w in job_warnings]
         for title, field in (("보완점·확인할 조건", "gaps"), ("지원 준비", "actions")):
             lines += ["", f"## {title}", ""] + [f"- {text(x)}" for x in job[field]]
         lines += ["", "## 내 메모", "", START + notes + END, ""]
@@ -111,6 +129,8 @@ def render(data, output, today=None, buffer_days=2):
     lines = ["# Apply Tracker", "", f"조사일: {data['searched_at']} · 일정 기준일: {today.isoformat()}", "",
              "상태·메모 열과 ‘내 메모’ 영역은 수정할 수 있으며 재실행해도 보존됩니다.",
              "권장 지원일은 마감일에서 여유일을 뺀 목표일입니다. 실제 마감 시각·시간대는 원문에서 확인하세요.", ""]
+    if warnings:
+        lines += ['## 검증 경고', ''] + [f'- {text(w)}' for w in warnings] + ['']
     plans = []
     for title, items in groups.items():
         items.sort(key=lambda pair: (pair[1]["job"].get("deadline") or "9999-12-31", MATCHES.index(pair[1]["job"]["match"]), pair[0]))
