@@ -47,3 +47,5 @@ information remains in the source notes; sorting uses calendar dates.
 
 See the [v2 contract and compatibility rules](research-contract.md). New research uses structured
 posting and profile evidence. Rendering retains v1 support and user notes; warnings are shown in reports.
+
+[Quality evaluation](quality-evaluation.md) uses six fictional offline cases and constraint-based checks.

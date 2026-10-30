@@ -11,6 +11,7 @@ from datetime import date
 from pathlib import Path
 
 from .core import render, validate
+from .evaluation import evaluate
 from .schema import SCHEMA
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -92,6 +93,9 @@ def main(argv=None):
     sub.add_argument("--output", default="output")
     sub.add_argument("--today", type=date.fromisoformat, default=date.today())
     sub.add_argument("--buffer-days", type=int, default=2)
+    sub = subs.add_parser('evaluate', help='가상 사례의 품질 제약 평가 (기본: 오프라인)')
+    sub.add_argument('--fixtures', type=Path, default=ROOT / 'tests/fixtures/quality')
+    sub.add_argument('--responses', type=Path, help='저장된 <fixture>[.<run>].json 폴더')
     args = parser.parse_args(argv)
     try:
         if args.command == "init":
@@ -116,6 +120,10 @@ def main(argv=None):
                 path = render(data, output, buffer_days=args.buffer_days)
                 (output / "research.json").write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
                 print(path.resolve())
+        elif args.command == 'evaluate':
+            report = evaluate(args.fixtures, args.responses)
+            print(json.dumps(report, ensure_ascii=False, indent=2))
+            return 0 if report['passed'] else 1
         else:
             data = json.loads(args.research.read_text(encoding="utf-8"))
             print(render(data, args.output, args.today, args.buffer_days).resolve())

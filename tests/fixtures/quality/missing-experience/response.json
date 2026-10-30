@@ -1,0 +1,53 @@
+{
+  "schema_version": "2",
+  "run": {
+    "agent": "fixture",
+    "instruction_hash": "sha256:5698de64e8a598bd56c4277bb9cd1213d290f4dada69f1d0da13ad2908833d43",
+    "input_files": [
+      "profile.md",
+      "sources.md"
+    ]
+  },
+  "searched_at": "2026-09-15",
+  "jobs": [
+    {
+      "company": "Fictional Company",
+      "role": "Fictional Developer",
+      "url": "https://example.com/jobs/missing-experience",
+      "checked_at": "2026-09-15",
+      "deadline_kind": "unspecified",
+      "deadline": null,
+      "deadline_note": "Fictional extracted posting; no live research.",
+      "closed": false,
+      "match": "판단 보류",
+      "summary": "Fictional assessment with input-linked evidence.",
+      "official_source_urls": [],
+      "requirements": [
+        {
+          "requirement": "Operate Kubernetes",
+          "importance": "required",
+          "assessment": "unknown",
+          "job_evidence": {
+            "source_url": "https://example.com/jobs/missing-experience",
+            "detail": "Operate Kubernetes in production"
+          },
+          "profile_evidence": [],
+          "rationale": "Only the cited input supports this assessment; verify any undocumented experience."
+        }
+      ],
+      "gaps": [
+        "Verify any undocumented experience."
+      ],
+      "actions": [
+        "Review the evidence before applying."
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://example.com/careers",
+      "status": "checked",
+      "note": "Fictional fixture; no live web research."
+    }
+  ]
+}

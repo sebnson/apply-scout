@@ -1,0 +1,17 @@
+{
+  "company": "Fictional Company",
+  "role": "Fictional Developer",
+  "url": "https://example.com/jobs/preferred-gap",
+  "requirements": [
+    {
+      "requirement": "Design Python APIs",
+      "importance": "required",
+      "detail": "Design Python APIs"
+    },
+    {
+      "requirement": "Use Rust",
+      "importance": "preferred",
+      "detail": "Rust is preferred"
+    }
+  ]
+}
