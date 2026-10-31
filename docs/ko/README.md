@@ -137,6 +137,7 @@ python3 -m unittest discover -s tests -v
 ```
 
 - [구조와 다음 단계](architecture.md)
+- [품질 검증과 공고별 첨삭 계획](quality-tailoring-plan.md)
 - [기여 가이드](contributing.md)
 - [공통 조사 지침](research-instructions.md)
 - CLI 참고: [Codex 비대화형 실행](https://developers.openai.com/codex/noninteractive/),
