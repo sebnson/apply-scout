@@ -1,0 +1,23 @@
+{
+  "requirements": [
+    {
+      "requirement": "Design Python APIs",
+      "importance": "required",
+      "assessments": [
+        "met"
+      ]
+    },
+    {
+      "requirement": "Use Rust",
+      "importance": "preferred",
+      "assessments": [
+        "unmet"
+      ]
+    }
+  ],
+  "matches": [
+    "높음"
+  ],
+  "forbidden_evidence": [],
+  "warning_count": 0
+}

@@ -1,0 +1,12 @@
+{
+  "company": "Fictional Company",
+  "role": "Fictional Developer",
+  "url": "https://example.com/jobs/missing-experience",
+  "requirements": [
+    {
+      "requirement": "Operate Kubernetes",
+      "importance": "required",
+      "detail": "Operate Kubernetes in production"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "company": "Fictional Company",
+  "role": "Fictional Developer",
+  "url": "https://example.com/jobs/required-gap",
+  "requirements": [
+    {
+      "requirement": "Work onsite",
+      "importance": "required",
+      "detail": "Work onsite five days per week"
+    }
+  ]
+}

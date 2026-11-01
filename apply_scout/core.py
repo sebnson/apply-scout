@@ -1,33 +1,17 @@
 """Validate research and render a persistent Markdown application tracker."""
 
-import hashlib
 import html
 import json
 import re
 from datetime import date, timedelta
 from pathlib import Path
-from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit, quote
+from urllib.parse import quote
 
+from .schema import MATCHES
+from .validation import canonical_url, job_id, normalize, validate, validate_consistency
 
-MATCHES = ("높음", "보통", "낮음", "판단 보류")
-DEADLINES = ("dated", "rolling", "unspecified", "unknown")
 START = "<!-- user-notes:start -->"
 END = "<!-- user-notes:end -->"
-
-
-def canonical_url(value):
-    parts = urlsplit(value)
-    if parts.scheme not in ("https", "http") or not parts.hostname or parts.username or parts.password:
-        raise ValueError("공고·출처 링크는 자격 증명이 없는 http(s) URL이어야 합니다.")
-    query = [(k, v) for k, v in parse_qsl(parts.query, keep_blank_values=True)
-             if not k.lower().startswith("utm_") and k.lower() not in ("fbclid", "gclid")]
-    # Preserve fragments: several ATS products use hash-based job routes.
-    return urlunsplit((parts.scheme.lower(), parts.netloc.lower(), parts.path or "/",
-                       urlencode(sorted(query)), parts.fragment))
-
-
-def job_id(url):
-    return hashlib.sha256(canonical_url(url).encode()).hexdigest()[:16]
 
 
 def text(value):
@@ -40,64 +24,6 @@ def text(value):
 
 def link(label, url):
     return f"[{text(label)}]({quote(url, safe=':/?=&%#+@;~-._')})"
-
-
-def check_string(obj, field):
-    if not isinstance(obj.get(field), str) or not obj[field].strip():
-        raise ValueError(f"{field}: 비어 있지 않은 문자열이 필요합니다.")
-
-
-def validate(data):
-    if not isinstance(data, dict) or not isinstance(data.get("jobs"), list) or not isinstance(data.get("sources"), list):
-        raise ValueError("jobs와 sources 배열이 필요합니다.")
-    check_string(data, "searched_at")
-    searched = date.fromisoformat(data["searched_at"])
-    seen = set()
-    for job in data["jobs"]:
-        if not isinstance(job, dict):
-            raise ValueError("공고는 객체여야 합니다.")
-        for field in ("company", "role", "url", "checked_at", "deadline_kind", "deadline_note", "match", "summary"):
-            check_string(job, field)
-        key = job_id(job["url"])
-        if key in seen:
-            raise ValueError("중복 공고 URL이 있습니다. 원문 공고 하나로 통합하세요.")
-        seen.add(key)
-        checked = date.fromisoformat(job["checked_at"])
-        if checked > searched:
-            raise ValueError("공고 확인일이 조사일보다 미래입니다.")
-        if job["deadline_kind"] not in DEADLINES or job["match"] not in MATCHES:
-            raise ValueError("마감일 유형 또는 매칭 평가가 올바르지 않습니다.")
-        if job["deadline_kind"] == "dated":
-            date.fromisoformat(job.get("deadline", ""))
-        elif job.get("deadline") is not None:
-            raise ValueError("날짜가 없는 마감 유형은 deadline=null이어야 합니다.")
-        if type(job.get("closed")) is not bool:
-            raise ValueError("closed는 boolean이어야 합니다.")
-        for field in ("requirements", "gaps", "actions"):
-            if not isinstance(job.get(field), list):
-                raise ValueError(f"{field} 배열이 필요합니다.")
-        if not job["requirements"]:
-            raise ValueError("공고마다 최소 하나의 요구사항과 판단 근거가 필요합니다.")
-        for item in job["requirements"]:
-            if not isinstance(item, dict):
-                raise ValueError("요구사항은 객체여야 합니다.")
-            for field in ("requirement", "evidence", "assessment", "source_url"):
-                check_string(item, field)
-            canonical_url(item["source_url"])
-        for item in job["gaps"] + job["actions"]:
-            if not isinstance(item, str) or not item.strip():
-                raise ValueError("보완점과 준비 항목은 문자열이어야 합니다.")
-    for source in data["sources"]:
-        if not isinstance(source, dict):
-            raise ValueError("출처는 객체여야 합니다.")
-        for field in ("url", "status", "note"):
-            check_string(source, field)
-        canonical_url(source["url"])
-        if source["status"] not in ("checked", "blocked", "failed"):
-            raise ValueError("출처 상태는 checked, blocked, failed 중 하나여야 합니다.")
-    if not data["sources"]:
-        raise ValueError("조사한 출처 또는 접근 실패 기록이 필요합니다.")
-    return data
 
 
 def user_notes(path):
@@ -141,6 +67,8 @@ def is_closed(job, today):
 
 def render(data, output, today=None, buffer_days=2):
     validate(data)
+    warnings = validate_consistency(data) if data.get('schema_version') == '2' else []
+    data = normalize(data)
     today = today or date.today()
     if buffer_days < 0:
         raise ValueError("지원 여유일은 0 이상이어야 합니다.")
@@ -169,9 +97,25 @@ def render(data, output, today=None, buffer_days=2):
                  f"- 공고: {link('원문 보기', job['url'])}", f"- 확인일: {job['checked_at']}",
                  f"- 마감일: {deadline_label(job)}", f"- 마감 안내: {text(job['deadline_note'])}",
                  f"- 매칭 평가: **{job['match']}**", "", "## 직무와 적합성 요약", "", text(job["summary"]), "",
-                 "## 요구사항과 내 경험", "", "| 요구사항 | 내 경험의 근거 | 판단 | 출처 |", "|---|---|---|---|"]
-        for r in job["requirements"]:
-            lines.append(f"| {text(r['requirement'])} | {text(r['evidence'])} | {text(r['assessment'])} | {link('원문', r['source_url'])} |")
+                 "## 요구사항과 내 경험", ""]
+        if data['schema_version'] == '1':
+            lines += ["| 요구사항 | 내 경험의 근거 | 판단 | 출처 |", "|---|---|---|---|"]
+            for r in job['requirements']:
+                old = r['legacy']
+                lines.append(f"| {text(r['requirement'])} | {text(old['evidence'])} | {text(old['assessment'])} | {link('원문', old['source_url'])} |")
+        else:
+            importance = {'required': '필수', 'preferred': '우대', 'responsibility': '담당 업무', 'unknown': '확인 필요'}
+            assessment = {'met': '충족', 'partial': '부분 충족', 'unmet': '미충족', 'unknown': '확인 필요'}
+            lines += ["| 요구사항 | 중요도 | 공고 근거 | 내 경험의 근거 | 판단 | 판단 이유 | 출처 |", "|---|---|---|---|---|---|---|"]
+            for r in job['requirements']:
+                evidence = '; '.join(f"{e['file']} / {e['section']}: {e['detail']}" for e in r['profile_evidence']) or '입력 근거 없음'
+                cells = [text(r['requirement']), importance[r['importance']], text(r['job_evidence']['detail']),
+                         text(evidence), assessment[r['assessment']], text(r['rationale']), link('원문', r['job_evidence']['source_url'])]
+                lines.append('| ' + ' | '.join(cells) + ' |')
+            index = next(i for i, item in enumerate(data['jobs']) if job_id(item['url']) == key)
+            job_warnings = [warning for warning in warnings if warning.startswith(f'$.jobs[{index}].')]
+            if job_warnings:
+                lines += ['', '## 검증 경고', ''] + [f'- {text(w)}' for w in job_warnings]
         for title, field in (("보완점·확인할 조건", "gaps"), ("지원 준비", "actions")):
             lines += ["", f"## {title}", ""] + [f"- {text(x)}" for x in job[field]]
         lines += ["", "## 내 메모", "", START + notes + END, ""]
@@ -185,6 +129,8 @@ def render(data, output, today=None, buffer_days=2):
     lines = ["# Apply Tracker", "", f"조사일: {data['searched_at']} · 일정 기준일: {today.isoformat()}", "",
              "상태·메모 열과 ‘내 메모’ 영역은 수정할 수 있으며 재실행해도 보존됩니다.",
              "권장 지원일은 마감일에서 여유일을 뺀 목표일입니다. 실제 마감 시각·시간대는 원문에서 확인하세요.", ""]
+    if warnings:
+        lines += ['## 검증 경고', ''] + [f'- {text(w)}' for w in warnings] + ['']
     plans = []
     for title, items in groups.items():
         items.sort(key=lambda pair: (pair[1]["job"].get("deadline") or "9999-12-31", MATCHES.index(pair[1]["job"]["match"]), pair[0]))

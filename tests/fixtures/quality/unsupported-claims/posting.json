@@ -1,0 +1,12 @@
+{
+  "company": "Fictional Company",
+  "role": "Fictional Developer",
+  "url": "https://example.com/jobs/unsupported-claims",
+  "requirements": [
+    {
+      "requirement": "Write Python scripts",
+      "importance": "required",
+      "detail": "Write Python scripts"
+    }
+  ]
+}

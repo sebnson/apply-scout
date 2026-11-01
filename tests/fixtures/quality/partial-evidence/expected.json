@@ -1,0 +1,18 @@
+{
+  "requirements": [
+    {
+      "requirement": "Design and operate Python APIs",
+      "importance": "required",
+      "assessments": [
+        "partial"
+      ]
+    }
+  ],
+  "matches": [
+    "보통"
+  ],
+  "forbidden_evidence": [
+    "five years"
+  ],
+  "warning_count": 0
+}

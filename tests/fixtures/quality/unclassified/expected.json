@@ -1,0 +1,16 @@
+{
+  "requirements": [
+    {
+      "requirement": "Prepare design documents",
+      "importance": "unknown",
+      "assessments": [
+        "met"
+      ]
+    }
+  ],
+  "matches": [
+    "판단 보류"
+  ],
+  "forbidden_evidence": [],
+  "warning_count": 1
+}

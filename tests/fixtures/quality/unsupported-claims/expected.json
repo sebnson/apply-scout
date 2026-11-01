@@ -1,0 +1,20 @@
+{
+  "requirements": [
+    {
+      "requirement": "Write Python scripts",
+      "importance": "required",
+      "assessments": [
+        "met"
+      ]
+    }
+  ],
+  "matches": [
+    "높음"
+  ],
+  "forbidden_evidence": [
+    "Kubernetes",
+    "99.9%",
+    "Led a team of 12"
+  ],
+  "warning_count": 0
+}

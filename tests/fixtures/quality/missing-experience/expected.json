@@ -1,0 +1,18 @@
+{
+  "requirements": [
+    {
+      "requirement": "Operate Kubernetes",
+      "importance": "required",
+      "assessments": [
+        "unknown"
+      ]
+    }
+  ],
+  "matches": [
+    "판단 보류"
+  ],
+  "forbidden_evidence": [
+    "Kubernetes operator"
+  ],
+  "warning_count": 0
+}

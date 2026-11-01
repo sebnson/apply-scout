@@ -42,3 +42,12 @@ Do not run multiple processes against the same output folder.
 The program detects duplicate URLs after removing tracking parameters. The AI handles duplicates across
 different recruiting platforms. Weekly application limits are not scheduled automatically. Time zone
 information remains in the source notes; sorting uses calendar dates.
+
+## Research contract
+
+See the [v2 contract and compatibility rules](research-contract.md). New research uses structured
+posting and profile evidence. Rendering retains v1 support and user notes; warnings are shown in reports.
+
+[Quality evaluation](quality-evaluation.md) uses six fictional offline cases and constraint-based checks.
+
+[Tailoring and rewriting](tailoring-followup.md) have a separate follow-up plan; they are not part of v0.2.

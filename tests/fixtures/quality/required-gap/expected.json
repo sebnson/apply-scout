@@ -1,0 +1,16 @@
+{
+  "requirements": [
+    {
+      "requirement": "Work onsite",
+      "importance": "required",
+      "assessments": [
+        "unmet"
+      ]
+    }
+  ],
+  "matches": [
+    "낮음"
+  ],
+  "forbidden_evidence": [],
+  "warning_count": 0
+}

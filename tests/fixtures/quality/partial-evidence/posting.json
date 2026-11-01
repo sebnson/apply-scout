@@ -1,0 +1,12 @@
+{
+  "company": "Fictional Company",
+  "role": "Fictional Developer",
+  "url": "https://example.com/jobs/partial-evidence",
+  "requirements": [
+    {
+      "requirement": "Design and operate Python APIs",
+      "importance": "required",
+      "detail": "Design and operate Python APIs in production"
+    }
+  ]
+}

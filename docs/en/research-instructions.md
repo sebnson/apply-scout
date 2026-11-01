@@ -31,9 +31,16 @@ Keep the enum values shown below unchanged to remain compatible with the current
 ## Matching
 
 - Evaluate role-related experience, skills, and outcomes. Do not use demographic characteristics.
-- For each requirement, record the posting source (`source_url`), experience evidence with the input
-  filename and section (`evidence`), and an assessment (`assessment`): met, partially met, not met, or needs verification.
-- Missing experience in the input means “needs verification,” not “not met.”
+- Classify each requirement's `importance` as `required`, `preferred`, `responsibility`, or `unknown`,
+  and its `assessment` as `met`, `partial`, `unmet`, or `unknown`.
+- Record the posting URL and source detail in `job_evidence` (`source_url`, `detail`). For other evidence,
+  use only official linked URLs listed in that job's `official_source_urls` and marked `checked` in `sources`.
+- `profile_evidence` is an array of `file`, `section`, and `detail` from documents actually included in
+  the run. `met`, `partial`, and `unmet` need at least one input evidence item.
+- Missing experience in the input means `unknown`, not `unmet`. Explain the assessment in `rationale`;
+  for `unknown`, include a question to verify or explain the missing information.
+- A required `unmet` item forbids an overall `높음`. When all required items are `unknown`, do not use
+  `높음` or `보통`. Empty requirements or unclassified importance should use `판단 보류` or produce a review warning.
 - `높음` (High): substantial specific evidence supports the main requirements, with no known essential-condition conflict.
 - `보통` (Moderate): relevant experience exists, but some important requirements are only partially met or need verification.
 - `낮음` (Low): evidence conflicts with an explicit job requirement or an essential user condition.
@@ -50,3 +57,9 @@ Distinguish observed facts from judgments. Do not copy the full profile or conta
 
 Include at least one result in `sources` for every supplied site. Report access restrictions and research
 failures honestly, even when no openings could be verified.
+
+## Output version and run record
+
+New research uses `schema_version="2"`. Return the supplied `run` metadata unchanged.
+`run.input_files` contains only the filenames included in this run. `instruction_hash` hashes the
+runtime instructions and schema only, never the full prompt or personal documents.

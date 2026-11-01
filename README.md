@@ -20,6 +20,7 @@ Apply Scout는 마감일순 지원표와 공고별 분석을 만들고 재실행
 | Getting started / 시작하기 | [Guide](docs/en/README.md) | [가이드](docs/ko/README.md) |
 | Example tracker / 지원표 예시 | [Preview](docs/en/examples/output/apply-tracker.md) | [미리 보기](docs/ko/examples/output/apply-tracker.md) |
 | Architecture / 구조 | [Architecture](docs/en/architecture.md) | [구조와 다음 단계](docs/ko/architecture.md) |
+| Quality and tailoring plan / 품질·첨삭 계획 | [Plan](docs/en/quality-tailoring-plan.md) | [계획](docs/ko/quality-tailoring-plan.md) |
 | Research instructions / 조사 지침 | [Instructions](docs/en/research-instructions.md) | [조사 지침](docs/ko/research-instructions.md) |
 | Agent guide / 에이전트 가이드 | [Guide](docs/en/agent-guide.md) | [가이드](docs/ko/agent-guide.md) |
 | Contributing / 기여 | [Contributing](docs/en/contributing.md) | [기여 가이드](docs/ko/contributing.md) |

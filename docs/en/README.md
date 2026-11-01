@@ -155,6 +155,7 @@ python3 -m unittest discover -s tests -v
 ```
 
 - [Architecture and roadmap](architecture.md)
+- [Quality validation and role-specific tailoring plan](quality-tailoring-plan.md)
 - [Contributing](contributing.md)
 - [Shared research instructions](research-instructions.md)
 - CLI references: [Codex non-interactive mode](https://developers.openai.com/codex/noninteractive/),
